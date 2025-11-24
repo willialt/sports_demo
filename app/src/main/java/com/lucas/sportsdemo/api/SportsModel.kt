@@ -7,7 +7,6 @@ import com.lucas.sportsdemo.api.models.WeekX
 
 
 data class SportsModel(
-//    @SerializedName("events") // added to ignore model mismatches
     val events: List<Event>,
     val leagues: List<League>,
     val season: SeasonXX,

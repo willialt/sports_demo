@@ -13,6 +13,7 @@ import com.lucas.sportsdemo.api.SportsModel
 //import com.lucas.sportsdemo.api.mappers.GameMapper
 import com.lucas.sportsdemo.api.models.Event
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class SportsViewModel : ViewModel(){
 
@@ -24,7 +25,15 @@ class SportsViewModel : ViewModel(){
     private val _gamesUiList = MutableLiveData<List<GameCardUiModel>>() // changed GameCardUiModel to Any to be safe for all sports
     val gamesUiList: LiveData<List<GameCardUiModel>> = _gamesUiList // same as above
 
-    fun getLeagueData(sport: String) {
+    // new variables for parameters
+    var defaultWeek: Int? = null
+    var defaultYear : Int? = null
+    var defaultSeasonType: Int? = null
+    var currentLeague: String? = null
+
+
+    fun getLeagueData(sport: String, lastWeek: Boolean) {
+        currentLeague = sport // saves sport
         _sportsResult.value = NetworkResponse.Loading
         val (sportCategory, leaguePath) = when (sport) {
             "NCAAF" -> "football" to "college-football"
@@ -39,56 +48,28 @@ class SportsViewModel : ViewModel(){
         }
 
         viewModelScope.launch {
-//            try {
-//                val response = when (sport) {
-//                    "NCAAF" -> RetrofitInstance.sportsApi.getFootballGames("college-football")
-//                    "NFL" -> RetrofitInstance.sportsApi.getFootballGames("nfl")
-////                    "NBA" -> RetrofitInstance.basketballApi.getBasketballGames("nba")
-////                    "NCAAM" -> RetrofitInstance.basketballApi.getBasketballGames("mens-college-basketball")
-//                    else -> null
-//                }
-//
-////                if (response == null) {
-////                    _sportsResult.value = NetworkResponse.Error("No API for $sport")
-////                    return@launch
-////                }
-////                if (!response?.isSuccessful) {
-////                    _sportsResult.value =
-////                        NetworkResponse.Error("Request failed: ${response.code()}")
-////                    return@launch
-////                }
-//
-//                if (response.isSuccessful) {
-//                    val model = response.body()
-//
-//                    // convert events to GameCardUiModel depending on type
-////                    val uiModels = when (sport) {
-////                        "NCAAF" -> model.events.orEmpty().map { event ->
-////                            GameMapper.fromFootball(event)
-////                        }
-////                        "NFL" -> val ui = response.body()?.events?.map { GameMapper.fromFootball(it) }
-////                        "NBA" ->
-////                            "NCAAM"
-////                        else -> emptyList()
-////                    }
-//
-//                    _gamesUiList.value = uiModels
-//                    _sportsResult.value = NetworkResponse.Success(model!!)
-//                    // Error on line above: Assignment type mismatch: actual type is 'NetworkResponse.Success<Any>', but '@Nullable() NetworkResponse<SportsModel>!' was expected
-//                } else {
-//                    _sportsResult.value = NetworkResponse.Error("Failed to load data")
-//                }
-//            } catch (e: Exception) {
-//                _sportsResult.value = NetworkResponse.Error("Exception: ${e.message}")
-//            }
             // Commenting out what had previously working for just football to be safe
             try {
                 // FIX ME! call basketball API when NBA r
-                val response = sportsApi.getFootballGames( leaguePath)
+                val weekToLoad = if (lastWeek) defaultWeek?.minus(1) else defaultWeek
+
+                val response = sportsApi.getFootballGames(
+                    league = leaguePath,
+                    year = defaultYear,
+                    week = weekToLoad,
+                    seasonType = defaultSeasonType
+                )
                 Log.i("test url","URL test: $sportCategory / $leaguePath -> ${response.raw().request.url}")
                 if (response.isSuccessful) {
                     val model = response.body()
                     _sportsResult.value = NetworkResponse.Success(model!!)
+
+                    // Save calendar values on default call
+                    if (defaultWeek == null) {
+                        defaultYear = model.season.year
+                        defaultSeasonType = model.season.type
+                        defaultWeek = model.week.number
+                    }
 
                     // convert each event to GameCardUiModel
                     val events = model.events.orEmpty()
@@ -105,6 +86,7 @@ class SportsViewModel : ViewModel(){
             }
         }
     }
+
     fun Event.toUiModel(): GameCardUiModel {
         val competition = competitions.firstOrNull()
         val competitors = competition?.competitors.orEmpty()

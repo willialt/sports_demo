@@ -10,7 +10,10 @@ interface SportsApi {
     @GET("apis/site/v2/sports/football/{league}/scoreboard")
     suspend fun getFootballGames( // changed from getGames
         // weather has key and q, cfb has calendar and dates
-    @retrofit2.http.Path("league") league: String
-//        @Query("dates") date : String
+    @retrofit2.http.Path("league") league: String,
+    @Query("week") week : Int? = null,
+    @Query("dates") year : Int? = null,
+    @Query("seasontype") seasonType : Int? = null,
+    @Query("groups") groups : Int? = null
     ) : Response<SportsModel>
 }

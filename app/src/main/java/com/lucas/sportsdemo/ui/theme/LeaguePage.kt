@@ -28,6 +28,10 @@ import androidx.compose.ui.unit.sp
 import com.lucas.sportsdemo.SportsViewModel
 import com.lucas.sportsdemo.api.NetworkResponse
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @Composable
 fun LeaguePage(viewModel: SportsViewModel) {
@@ -61,7 +65,7 @@ fun LeaguePage(viewModel: SportsViewModel) {
                     Button(
                         onClick = {
                         // later -> trigger API call for this league
-                         viewModel.getLeagueData(league)
+                         viewModel.getLeagueData(sport = league, lastWeek = false)
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
@@ -87,12 +91,83 @@ fun LeaguePage(viewModel: SportsViewModel) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Weekly Games",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            // Add row here with buttons for "Parley Builder", "Last Week", "This Week", and drop down Menu
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFF5F5F5))
+                .padding(top = 24.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+//                Button(
+//                    onClick = {}, // variable to change state of view.
+//                    modifier = Modifier
+//                        .fillMaxWidth(0.2f)
+//                        .height(48.dp)
+//                ) {
+//                    Text(
+//                        text = "Parley Builder",
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+                var showLastWeek by remember { mutableStateOf(false) }
+
+                WeekTabs(
+                    selected = showLastWeek,
+                    onSelect = { isLastWeek ->
+                        showLastWeek = isLastWeek
+
+                        val sport = viewModel.currentLeague ?: return@WeekTabs
+                        viewModel.getLeagueData(sport = sport, lastWeek = isLastWeek)
+                    }
+                )
+
+//                Button(
+//                    onClick = {
+//                        // issue that league doesn't save from first call.
+//                        viewModel.getLeagueData(
+//                            sport = viewModel.currentLeague ?: return@Button,
+//                            lastWeek = true
+//                        )
+//                    },
+//                    modifier = Modifier
+//                        .fillMaxWidth(0.2f)
+//                        .height(48.dp)
+//                ) {
+//                    Text(
+//                        text = "Last Week",
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+//                Button(
+//                    onClick = {
+//                        viewModel.getLeagueData(
+//                            sport = viewModel.currentLeague ?: return@Button,
+//                            lastWeek = false
+//                        )
+//                    },
+//                    modifier = Modifier
+//                        .fillMaxWidth(0.2f)
+//                        .height(48.dp)
+//                ) {
+//                    Text(
+//                        text = "This Week",
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+                // If on college football, Drop down menu with college conferences...
+                // add later
+            }
+            //
+//            Text(
+//                text = "weekly games",
+//                fontSize = 22.sp,
+//                fontWeight = FontWeight.Bold,
+//                modifier = Modifier.padding(bottom = 8.dp)
+//            )
 
             // Show content or loading
             when(val result = sportsResult.value) {
