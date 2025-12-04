@@ -15,5 +15,10 @@ data class GameCardUiModel(
     val team2Logo: String?,
     val team1Color: String?,
     val team2Color: String?,
-    val broadcast: String? = null
+    val broadcast: String? = null,
+    val status: GameStatus,
+    val homeScore:  String?,
+    val awayScore: String?,
+    val homeWinner: Boolean?,
+    val awayWinner: Boolean?
 )

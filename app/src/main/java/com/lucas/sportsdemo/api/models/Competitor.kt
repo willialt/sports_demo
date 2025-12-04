@@ -11,5 +11,6 @@ data class Competitor(
     val statistics: List<Any?>,
     val team: TeamXX,
     val type: String,
-    val uid: String
+    val uid: String,
+    val winner: Boolean
 )

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 //import com.lucas.sportsdemo.api.BasketballModel
 import com.lucas.sportsdemo.api.GameCardUiModel
+import com.lucas.sportsdemo.api.GameStatus
 import com.lucas.sportsdemo.api.NetworkResponse
 import com.lucas.sportsdemo.api.RetrofitInstance
 import com.lucas.sportsdemo.api.SportsModel
@@ -33,6 +34,14 @@ class SportsViewModel : ViewModel(){
 
 
     fun getLeagueData(sport: String, lastWeek: Boolean) {
+        // Reset defaults whenever user selects a new league
+        if (currentLeague != sport) {
+            defaultWeek = null
+            defaultYear = null
+            defaultSeasonType = null
+        }
+
+
         currentLeague = sport // saves sport
         _sportsResult.value = NetworkResponse.Loading
         val (sportCategory, leaguePath) = when (sport) {
@@ -64,12 +73,13 @@ class SportsViewModel : ViewModel(){
                     val model = response.body()
                     _sportsResult.value = NetworkResponse.Success(model!!)
 
-                    // Save calendar values on default call
+                    // if there's no default week (first call or league change), set current.
                     if (defaultWeek == null) {
                         defaultYear = model.season.year
                         defaultSeasonType = model.season.type
                         defaultWeek = model.week.number
                     }
+                    Log.i("default week","$defaultWeek")
 
                     // convert each event to GameCardUiModel
                     val events = model.events.orEmpty()
@@ -91,8 +101,14 @@ class SportsViewModel : ViewModel(){
         val competition = competitions.firstOrNull()
         val competitors = competition?.competitors.orEmpty()
         val broadcast = competition?.broadcasts?.firstOrNull()?.names?.firstOrNull()
-        val away = competitors.getOrNull(0)
-        val home = competitors.getOrNull(1)
+        val away = competitors.getOrNull(1)
+        val home = competitors.getOrNull(0)
+        val status = when(competition?.status?.type?.state) {
+            "pre" -> GameStatus.UPCOMING
+            "in" -> GameStatus.LIVE
+            "post" -> GameStatus.FINAL
+            else -> GameStatus.UPCOMING
+        }
         return GameCardUiModel(
             team1 = home?.team?.shortDisplayName ?: "TBD",
             team2 = away?.team?.shortDisplayName ?: "TBD",
@@ -108,7 +124,12 @@ class SportsViewModel : ViewModel(){
             team2Logo = away?.team?.logo,
             team1Color = home?.team?.color,
             team2Color = away?.team?.color,
-            broadcast = broadcast
+            broadcast = broadcast,
+            status = status,
+            homeScore = home?.score,
+            awayScore = away?.score,
+            homeWinner = home?.winner,
+            awayWinner = away?.winner
         )
     }
 

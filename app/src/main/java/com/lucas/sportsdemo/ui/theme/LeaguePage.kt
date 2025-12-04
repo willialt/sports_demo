@@ -32,12 +32,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.runtime.LaunchedEffect
+
 
 @Composable
 fun LeaguePage(viewModel: SportsViewModel) {
 
     val sportsResult = viewModel.sportsResult.observeAsState()
     val gamesUiList = viewModel.gamesUiList.observeAsState(emptyList())
+    var showLastWeek by remember { mutableStateOf(false) }
+
+    LaunchedEffect(viewModel.currentLeague) {
+        showLastWeek = false
+    }
+
 
     Row(
         modifier = Modifier
@@ -82,115 +93,63 @@ fun LeaguePage(viewModel: SportsViewModel) {
             }
         }
 
-        // ==== Right Main content area (Games) ====
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Add row here with buttons for "Parley Builder", "Last Week", "This Week", and drop down Menu
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFF5F5F5))
-                .padding(top = 24.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-
-//                Button(
-//                    onClick = {}, // variable to change state of view.
-//                    modifier = Modifier
-//                        .fillMaxWidth(0.2f)
-//                        .height(48.dp)
-//                ) {
-//                    Text(
-//                        text = "Parley Builder",
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-                var showLastWeek by remember { mutableStateOf(false) }
-
-                WeekTabs(
-                    selected = showLastWeek,
-                    onSelect = { isLastWeek ->
-                        showLastWeek = isLastWeek
-
-                        val sport = viewModel.currentLeague ?: return@WeekTabs
-                        viewModel.getLeagueData(sport = sport, lastWeek = isLastWeek)
-                    }
-                )
-
-//                Button(
-//                    onClick = {
-//                        // issue that league doesn't save from first call.
-//                        viewModel.getLeagueData(
-//                            sport = viewModel.currentLeague ?: return@Button,
-//                            lastWeek = true
-//                        )
-//                    },
-//                    modifier = Modifier
-//                        .fillMaxWidth(0.2f)
-//                        .height(48.dp)
-//                ) {
-//                    Text(
-//                        text = "Last Week",
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-//                Button(
-//                    onClick = {
-//                        viewModel.getLeagueData(
-//                            sport = viewModel.currentLeague ?: return@Button,
-//                            lastWeek = false
-//                        )
-//                    },
-//                    modifier = Modifier
-//                        .fillMaxWidth(0.2f)
-//                        .height(48.dp)
-//                ) {
-//                    Text(
-//                        text = "This Week",
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-                // If on college football, Drop down menu with college conferences...
-                // add later
+        // Show content or loading
+        when(val result = sportsResult.value) {
+            is NetworkResponse.Error -> {
+                Text(text = result.message)
             }
-            //
-//            Text(
-//                text = "weekly games",
-//                fontSize = 22.sp,
-//                fontWeight = FontWeight.Bold,
-//                modifier = Modifier.padding(bottom = 8.dp)
-//            )
+            NetworkResponse.Loading -> {
+                CircularProgressIndicator()
+            }
+            is NetworkResponse.Success<*> -> {
+                // Print the game cards for each event...
+                if (gamesUiList.value.isEmpty()) {
+                    Text("No Games available")
+                } else {
+                    // ==== Right Main content area (Tabs and Games) ====
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Add row here with buttons for "Parley Builder", "Last Week", "This Week", and drop down Menu
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFFF5F5F5))
+                                .padding(top = 24.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
 
-            // Show content or loading
-            when(val result = sportsResult.value) {
-                is NetworkResponse.Error -> {
-                    Text(text = result.message)
-                }
-                NetworkResponse.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is NetworkResponse.Success<*> -> {
-                    // Print the game cards for each event...
-                    if (gamesUiList.value.isEmpty()){
-                        Text("No Games available")
-                    } else {
+
+                            WeekTabs(
+                                selected = showLastWeek,
+                                onSelect = { isLastWeek ->
+                                    showLastWeek = isLastWeek
+
+                                    val sport = viewModel.currentLeague ?: return@WeekTabs
+                                    viewModel.getLeagueData(
+                                        sport = sport,
+                                        lastWeek = isLastWeek
+                                    )
+                                }
+                            )
+
+                            // If on college football, Drop down menu with college conferences...
+                            // add later
+                        }
                         LazyColumn {
-                            items(gamesUiList.value) { game->
+                            items(gamesUiList.value) { game ->
                                 GameCard(game = game)
                             }
                         }
                     }
                 }
-                null -> Unit
             }
+            null -> Unit
         }
     }
 }
