@@ -114,7 +114,7 @@ fun GameCard(game: GameCardUiModel) {
                                 fontSize = 16.sp
                             )
                             Text(
-                                text = "${game.team2Abr} ${game.spread?.formatSpread() ?: "N/A"}",
+                                text = "${game.team1Abr} ${game.spread?.formatSpread() ?: "N/A"}",
                                 fontSize = 13.sp,
                                 color = Color.Gray
                             )

@@ -54,7 +54,7 @@ fun LeaguePage(viewModel: SportsViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5))
-            .padding(top = 24.dp)
+            .padding(top = 74.dp, bottom = 74.dp) // changed from 24 top for google automotive
     ) {
         // ==== Left Menu ====
         Card (
