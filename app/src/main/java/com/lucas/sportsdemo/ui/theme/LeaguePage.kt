@@ -36,6 +36,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.LaunchedEffect
+import com.lucas.sportsdemo.api.BasketballModel
+import com.lucas.sportsdemo.api.SportsModel
 
 
 @Composable
@@ -107,6 +109,7 @@ fun LeaguePage(viewModel: SportsViewModel) {
                     Text("No Games available")
                 } else {
                     // ==== Right Main content area (Tabs and Games) ====
+
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
@@ -115,37 +118,51 @@ fun LeaguePage(viewModel: SportsViewModel) {
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Add row here with buttons for "Parley Builder", "Last Week", "This Week", and drop down Menu
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFF5F5F5))
-                                .padding(top = 24.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
+
+                        when (val data = result.data) {
+                            // if data is Football, have weekly tabs
+                            is SportsModel -> {
+                                // Add row here with buttons for "Parley Builder", "Last Week", "This Week", and drop down Menu
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF5F5F5))
+                                        .padding(top = 24.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
 
 
-                            WeekTabs(
-                                selected = showLastWeek,
-                                onSelect = { isLastWeek ->
-                                    showLastWeek = isLastWeek
+                                    WeekTabs(
+                                        selected = showLastWeek,
+                                        onSelect = { isLastWeek ->
+                                            showLastWeek = isLastWeek
 
-                                    val sport = viewModel.currentLeague ?: return@WeekTabs
-                                    viewModel.getLeagueData(
-                                        sport = sport,
-                                        lastWeek = isLastWeek
+                                            val sport = viewModel.currentLeague ?: return@WeekTabs
+                                            viewModel.getLeagueData(
+                                                sport = sport,
+                                                lastWeek = isLastWeek
+                                            )
+                                        }
                                     )
-                                }
-                            )
 
-                            // If on college football, Drop down menu with college conferences...
-                            // add later
-                        }
-                        LazyColumn {
-                            items(gamesUiList.value) { game ->
-                                GameCard(game = game)
+                                    // If on college football, Drop down menu with college conferences...
+                                    // add later
+                                }
+                                LazyColumn {
+                                    items(gamesUiList.value) { game ->
+                                        GameCard(game = game)
+                                    }
+                                }
+                            }
+                            is BasketballModel -> {
+                                LazyColumn {
+                                    items(gamesUiList.value) { game ->
+                                        GameCard(game = game)
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
             }

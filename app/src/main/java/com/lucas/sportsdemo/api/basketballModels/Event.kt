@@ -1,6 +1,6 @@
 package com.lucas.sportsdemo.api.basketballModels
 
-data class Event(
+data class NbaEvent(
     val competitions: List<Competition>,
     val date: String,
     val id: String,

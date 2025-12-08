@@ -13,14 +13,15 @@ import com.lucas.sportsdemo.api.RetrofitInstance
 import com.lucas.sportsdemo.api.SportsModel
 //import com.lucas.sportsdemo.api.mappers.GameMapper
 import com.lucas.sportsdemo.api.models.Event
+import com.lucas.sportsdemo.api.basketballModels.NbaEvent
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class SportsViewModel : ViewModel(){
 
     private val sportsApi = RetrofitInstance.sportsApi
-    private val _sportsResult = MutableLiveData<NetworkResponse<SportsModel>>()
-    val sportsResult : LiveData<NetworkResponse<SportsModel>> = _sportsResult
+    private val _sportsResult = MutableLiveData<NetworkResponse<Any>>() // changed SportsModel to Any
+    val sportsResult : LiveData<NetworkResponse<Any>> = _sportsResult
 
     // NEW: Hold simplified game data for UI
     private val _gamesUiList = MutableLiveData<List<GameCardUiModel>>() // changed GameCardUiModel to Any to be safe for all sports
@@ -59,36 +60,63 @@ class SportsViewModel : ViewModel(){
         viewModelScope.launch {
             // Commenting out what had previously working for just football to be safe
             try {
-                // FIX ME! call basketball API when NBA r
-                val weekToLoad = if (lastWeek) defaultWeek?.minus(1) else defaultWeek
+//                val raw = sportsApi.getRawJson("basketball", "nba")
 
-                val response = sportsApi.getFootballGames(
-                    league = leaguePath,
-                    year = defaultYear,
-                    week = weekToLoad,
-                    seasonType = defaultSeasonType
-                )
-                Log.i("test url","URL test: $sportCategory / $leaguePath -> ${response.raw().request.url}")
-                if (response.isSuccessful) {
-                    val model = response.body()
-                    _sportsResult.value = NetworkResponse.Success(model!!)
+//                val json = raw.body()?.string()
+//                Log.i("NBA_RAW", json ?: "NULL_JSON")
+                if (sportCategory == "basketball") {
+                    val response = sportsApi.getBasketballGames("basketball", leaguePath)
+                    if (response.isSuccessful) {
+                        val model = response.body()
+                        _sportsResult.value = NetworkResponse.Success(model!!) // Error here
 
-                    // if there's no default week (first call or league change), set current.
-                    if (defaultWeek == null) {
-                        defaultYear = model.season.year
-                        defaultSeasonType = model.season.type
-                        defaultWeek = model.week.number
+                        // convert each event to GameCardUiModel
+                        val events = model.events.orEmpty()
+                        val uiModels = events.map { it.toUiModel() }
+                        _gamesUiList.value = uiModels
+
+                    } else {
+                        _sportsResult.value = NetworkResponse.Error("Failed to load data")
+                        //                            Log.i("Error", response.message())
                     }
-                    Log.i("default week","$defaultWeek")
+                }
 
-                    // convert each event to GameCardUiModel
-                    val events = model.events.orEmpty()
-                    val uiModels = events.map { it.toUiModel() }
-                    _gamesUiList.value = uiModels
+                // football stuff ---
+                if (sportCategory == "football") {
+                    val weekToLoad = if (lastWeek) defaultWeek?.minus(1) else defaultWeek
 
-                } else {
-                    _sportsResult.value = NetworkResponse.Error("Failed to load data")
-//                            Log.i("Error", response.message())
+                    val response = sportsApi.getFootballGames(
+                        league = leaguePath,
+                        year = defaultYear,
+                        week = weekToLoad,
+                        seasonType = defaultSeasonType
+                    )
+
+                    Log.i(
+                        "test url",
+                        "URL test: $sportCategory / $leaguePath -> ${response.raw().request.url}"
+                    )
+                    if (response.isSuccessful) {
+                        val model = response.body()
+                        _sportsResult.value = NetworkResponse.Success(model!!)
+
+                        // if there's no default week (first call or league change), set current.
+                        if (defaultWeek == null) {
+                            defaultYear = model.season.year
+                            defaultSeasonType = model.season.type
+                            defaultWeek = model.week.number
+                        }
+                        Log.i("default week", "$defaultWeek")
+
+                        // convert each event to GameCardUiModel
+                        val events = model.events.orEmpty()
+                        val uiModels = events.map { it.toUiModel() }
+                        _gamesUiList.value = uiModels
+
+                    } else {
+                        _sportsResult.value = NetworkResponse.Error("Failed to load data")
+                        //                            Log.i("Error", response.message())
+                    }
                 }
             } catch (e: Exception) {
                 _sportsResult.value = NetworkResponse.Error("Exception: ${e.message}")
@@ -132,6 +160,43 @@ class SportsViewModel : ViewModel(){
             awayWinner = away?.winner
         )
     }
+    fun NbaEvent.toUiModel(): GameCardUiModel {
+        val competition = competitions.firstOrNull()
+        val competitors = competition?.competitors.orEmpty()
+        val broadcast = competition?.broadcasts?.firstOrNull()?.names?.firstOrNull()
+        val away = competitors.getOrNull(1)
+        val home = competitors.getOrNull(0)
+        val status = when(competition?.status?.type?.state) {
+            "pre" -> GameStatus.UPCOMING
+            "in" -> GameStatus.LIVE
+            "post" -> GameStatus.FINAL
+            else -> GameStatus.UPCOMING
+        }
+        return GameCardUiModel(
+            team1 = home?.team?.shortDisplayName ?: "TBD",
+            team2 = away?.team?.shortDisplayName ?: "TBD",
+            team1Record = home?.records?.firstOrNull()?.summary,
+            team2Record = away?.records?.firstOrNull()?.summary,
+            team1Rank = home?.curatedRank?.current ?: 99,
+            team2Rank = away?.curatedRank?.current ?: 99,
+            team1Abr = home?.team?.abbreviation,
+            team2Abr = away?.team?.abbreviation,
+            startTime = formatGameTime(competition?.date), // startTime = competition?.date,
+            spread = null, // add for upcoming game structure
+            team1Logo = home?.team?.logo,
+            team2Logo = away?.team?.logo,
+            team1Color = home?.team?.color,
+            team2Color = away?.team?.color,
+            broadcast = broadcast,
+            status = status,
+            homeScore = home?.score,
+            awayScore = away?.score,
+            homeWinner = home?.winner,
+            awayWinner = away?.winner
+        )
+    }
+
+
 
 //    fun toUiModel(): GameCardUiModel { // in process of making function usable for both basketball and football
 //        val competition = competitions.firstOrNull()

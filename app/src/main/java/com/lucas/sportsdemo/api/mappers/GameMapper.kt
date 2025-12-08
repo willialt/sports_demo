@@ -1,7 +1,7 @@
 package com.lucas.sportsdemo.api.mappers
 
 import com.lucas.sportsdemo.api.models.Event as FootballEvent
-import com.lucas.sportsdemo.api.basketballModels.Event as BasketballEvent
+import com.lucas.sportsdemo.api.basketballModels.NbaEvent as BasketballEvent
 import com.lucas.sportsdemo.api.GameCardUiModel
 
 object GameMapper {

@@ -1,5 +1,6 @@
 package com.lucas.sportsdemo.api
 
+import okhttp3.ResponseBody // problem
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -16,4 +17,19 @@ interface SportsApi {
     @Query("seasontype") seasonType : Int? = null,
     @Query("groups") groups : Int? = null
     ) : Response<SportsModel>
+
+    @GET("apis/site/v2/sports/{sport}/{league}/scoreboard")
+    suspend fun getBasketballGames(
+        @retrofit2.http.Path("sport") sport: String,
+        @retrofit2.http.Path("league") league: String,
+        @Query("dates") date: String? = null
+    ) : Response<BasketballModel>
+
+    @GET("apis/site/v2/sports/{sport}/{league}/scoreboard")
+    suspend fun getRawJson(
+        @retrofit2.http.Path("sport") sport: String,
+        @retrofit2.http.Path("league") league: String,
+        @Query("dates") date: String? = null
+    ): Response<ResponseBody> // this is okhttp3 not retrofit 2
+
 }
