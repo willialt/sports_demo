@@ -133,6 +133,8 @@ fun LeaguePage(viewModel: SportsViewModel) {
 
 
                                     WeekTabs(
+                                        leftTabName = "Last Week",
+                                        rightTabName = "This Week",
                                         selected = showLastWeek,
                                         onSelect = { isLastWeek ->
                                             showLastWeek = isLastWeek

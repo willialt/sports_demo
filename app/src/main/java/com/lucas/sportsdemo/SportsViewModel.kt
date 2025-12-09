@@ -131,6 +131,12 @@ class SportsViewModel : ViewModel(){
         val broadcast = competition?.broadcasts?.firstOrNull()?.names?.firstOrNull()
         val away = competitors.getOrNull(1)
         val home = competitors.getOrNull(0)
+        val team1Id = home?.id
+        val team2Id = away?.id
+        val period = competition?.status?.period
+        val displayClock = competition?.status?.displayClock
+        val shortDetail = competition?.status?.type?.shortDetail
+        val situation = competition?.situation
         val status = when(competition?.status?.type?.state) {
             "pre" -> GameStatus.UPCOMING
             "in" -> GameStatus.LIVE
@@ -138,24 +144,37 @@ class SportsViewModel : ViewModel(){
             else -> GameStatus.UPCOMING
         }
         return GameCardUiModel(
+            // General Teams Info
             team1 = home?.team?.shortDisplayName ?: "TBD",
+            team1Id = team1Id,
             team2 = away?.team?.shortDisplayName ?: "TBD",
+            team2Id = team2Id,
             team1Record = home?.records?.firstOrNull()?.summary,
             team2Record = away?.records?.firstOrNull()?.summary,
             team1Rank = home?.curatedRank?.current ?: 99,
             team2Rank = away?.curatedRank?.current ?: 99,
             team1Abr = home?.team?.abbreviation,
             team2Abr = away?.team?.abbreviation,
-            startTime = formatGameTime(competition?.date), // startTime = competition?.date,
-            spread = competition?.odds?.firstOrNull()?.spread,
             team1Logo = home?.team?.logo,
             team2Logo = away?.team?.logo,
             team1Color = home?.team?.color,
             team2Color = away?.team?.color,
-            broadcast = broadcast,
             status = status,
+            // Pregame Info
+            startTime = formatGameTime(competition?.date), // startTime = competition?.date,
+            spread = competition?.odds?.firstOrNull()?.spread,
+            broadcast = broadcast,
+            // Live Game Info
             homeScore = home?.score,
             awayScore = away?.score,
+            displayClock = displayClock,
+            period = period,
+            shortDetail = shortDetail,
+            possession = situation?.possession,
+            shortDownDistanceText = situation?.shortDownDistanceText,
+            possessionText = situation?.possessionText,
+
+            // Post game Info
             homeWinner = home?.winner,
             awayWinner = away?.winner
         )
@@ -166,6 +185,9 @@ class SportsViewModel : ViewModel(){
         val broadcast = competition?.broadcasts?.firstOrNull()?.names?.firstOrNull()
         val away = competitors.getOrNull(1)
         val home = competitors.getOrNull(0)
+        val period = competition?.status?.period
+        val displayClock = competition?.status?.displayClock
+        val shortDetail = competition?.status?.type?.shortDetail
         val status = when(competition?.status?.type?.state) {
             "pre" -> GameStatus.UPCOMING
             "in" -> GameStatus.LIVE
@@ -175,6 +197,8 @@ class SportsViewModel : ViewModel(){
         return GameCardUiModel(
             team1 = home?.team?.shortDisplayName ?: "TBD",
             team2 = away?.team?.shortDisplayName ?: "TBD",
+            team1Id = home?.id,
+            team2Id = away?.id,
             team1Record = home?.records?.firstOrNull()?.summary,
             team2Record = away?.records?.firstOrNull()?.summary,
             team1Rank = home?.curatedRank?.current ?: 99,
@@ -192,7 +216,16 @@ class SportsViewModel : ViewModel(){
             homeScore = home?.score,
             awayScore = away?.score,
             homeWinner = home?.winner,
-            awayWinner = away?.winner
+            awayWinner = away?.winner,
+            displayClock = displayClock,
+            period = period,
+            shortDetail = shortDetail,
+
+            possession = null,
+            shortDownDistanceText = null,
+            possessionText = null
+
+
         )
     }
 

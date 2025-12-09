@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun WeekTabs(
+    rightTabName: String,
+    leftTabName: String,
     selected: Boolean, // true = last week selected, false = this week
     onSelect: (Boolean) -> Unit
 ) {
@@ -31,13 +33,13 @@ fun WeekTabs(
         modifier = Modifier.fillMaxWidth()
     ) {
         TabItem(
-            text = "Last Week",
+            text = leftTabName,
             isSelected = selected,
             onClick = { onSelect(true) }
         )
         Spacer(modifier = Modifier.width(24.dp))
         TabItem(
-            text = "This Week",
+            text = rightTabName,
             isSelected = !selected,
             onClick = { onSelect(false) }
         )

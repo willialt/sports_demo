@@ -1,5 +1,6 @@
-package com.lucas.sportsdemo.api.models
+package com.lucas.sportsdemo.api.extraModels
 
+import com.lucas.sportsdemo.api.models.Situation
 
 data class Competition(
     val attendance: Int,
@@ -8,24 +9,21 @@ data class Competition(
     val competitors: List<Competitor>,
     val conferenceCompetition: Boolean,
     val date: String,
-    val dateValid: Boolean,
     val format: Format,
     val geoBroadcasts: List<GeoBroadcast>,
-    val groups: Groups,
-    val highlights: List<Any?>,
+    val headlines: List<Headline>,
+    val highlights: List<Highlight>,
     val id: String,
-    val leaders: List<LeaderXX>,
+    val leaders: List<Leader>,
     val neutralSite: Boolean,
     val notes: List<Any?>,
-    val odds: List<Odd>,
     val playByPlayAvailable: Boolean,
     val recent: Boolean,
+    val situation: Situation,
     val startDate: String,
-    val status: StatusX,
-    val tickets: List<Ticket>,
+    val status: Status,
     val timeValid: Boolean,
-    val type: TypeXX,
+    val type: TypeXXX,
     val uid: String,
-    val venue: VenueX,
-    val situation: Situation
+    val venue: VenueX
 )

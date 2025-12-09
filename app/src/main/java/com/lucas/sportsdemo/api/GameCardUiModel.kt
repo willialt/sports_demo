@@ -3,6 +3,8 @@ package com.lucas.sportsdemo.api
 data class GameCardUiModel(
     val team1: String,
     val team2: String,
+    val team1Id: String?,
+    val team2Id: String?,
     val team1Record: String?,
     val team2Record: String?,
     val team1Rank: Int?,
@@ -20,5 +22,11 @@ data class GameCardUiModel(
     val homeScore:  String?,
     val awayScore: String?,
     val homeWinner: Boolean?,
-    val awayWinner: Boolean?
+    val awayWinner: Boolean?,
+    val displayClock: String?,
+    val period: Int?,
+    val shortDetail: String?,
+    val possession: String?,
+    val shortDownDistanceText: String?,
+    val possessionText: String?
 )

@@ -122,7 +122,75 @@ fun GameCard(game: GameCardUiModel) {
                         }
                     }
                     GameStatus.LIVE -> {
-                        // do later
+                        // Live scores
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .fillMaxWidth(0.45f), // keeps the 3 blocks compact and centered
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            val awayScoreInt = game.awayScore?.toIntOrNull() ?: 0
+                            val homeScoreInt = game.homeScore?.toIntOrNull() ?: 0
+                            // === LEFT SCORE ===
+                            Box(
+                                modifier = Modifier.width(60.dp),  // fixed width
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = game.awayScore ?: "-",
+                                    fontWeight = if (awayScoreInt > homeScoreInt) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (awayScoreInt > homeScoreInt) Color.Black else Color.Gray,
+                                    fontSize = 42.sp
+                                )
+                            }
+
+                            // === LIVE ===
+                            Box(
+                                modifier = Modifier.width(110.dp),   // fixed width
+                                contentAlignment = Alignment.Center
+                            ) {
+                                //  Middle Column with Clock, quarter
+                                Column(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+//                      verticalArrangement = Arrangement.Center
+                                ) {
+                                    // Down and Distance
+                                    Text(
+                                        text = game.shortDownDistanceText ?: "---",
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 16.sp
+                                    )
+                                    // Time and Quarter
+                                    Text(
+                                        text = "${game.shortDetail}",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp
+                                    )
+
+                                    // Yard line
+                                    Text(
+                                        text = game.possessionText ?: "---",
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
+
+                            // === RIGHT SCORE ===
+                            Box(
+                                modifier = Modifier.width(60.dp),   // fixed width
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = game.homeScore ?: "-",
+                                    fontWeight = if (awayScoreInt < homeScoreInt) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (awayScoreInt < homeScoreInt) Color.Black else Color.Gray,
+                                    fontSize = 42.sp
+                                )
+                            }
+                        }
                     }
                     GameStatus.FINAL -> {
                         Row(
@@ -134,7 +202,7 @@ fun GameCard(game: GameCardUiModel) {
                         ) {
                             // === LEFT SCORE ===
                             Box(
-                                modifier = Modifier.width(50.dp),  // fixed width
+                                modifier = Modifier.width(80.dp),  // fixed width
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -159,7 +227,7 @@ fun GameCard(game: GameCardUiModel) {
 
                             // === RIGHT SCORE ===
                             Box(
-                                modifier = Modifier.width(50.dp),   // fixed width
+                                modifier = Modifier.width(80.dp),   // fixed width
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -273,6 +341,8 @@ fun GameCardPreview() {
             game = GameCardUiModel(
                 team1 = "USC",
                 team2 = "Northwestern",
+                team1Id = "24",
+                team2Id = "21",
                 team1Record = "7–2",
                 team2Record = "8–1",
                 team1Rank = 20,
@@ -286,11 +356,18 @@ fun GameCardPreview() {
                 team1Color = "9e2237",
                 team2Color = "582c83",
                 broadcast = "FOX",
-                status = GameStatus.FINAL, // add team scores and winner
+                status = GameStatus.LIVE, // add team scores and winner
                 homeScore = "17",
                 awayScore = "13",
-                homeWinner = true,
-                awayWinner = false
+                homeWinner = false,
+                awayWinner = false,
+                displayClock = "1:31",
+                period = 3,
+                shortDetail = "1:33 - 4th",
+                // Live variables
+                possession = "24",
+                possessionText = "PHI 34",
+                shortDownDistanceText = "3rd and 10",
             )
         )
     }
