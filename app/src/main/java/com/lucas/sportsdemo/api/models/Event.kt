@@ -4,7 +4,7 @@ data class Event(
     val competitions: List<Competition>,
     val date: String,
     val id: String,
-    val links: List<LinkXXXXXXXXX>,
+    val links: List<Link>,
     val name: String,
     val season: Season,
     val shortName: String,

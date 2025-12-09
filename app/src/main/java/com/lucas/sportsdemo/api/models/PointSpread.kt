@@ -1,8 +1,8 @@
 package com.lucas.sportsdemo.api.models
 
 data class PointSpread(
-    val away: AwayX,
+    val away: Away,
     val displayName: String,
-    val home: HomeX,
+    val home: Home,
     val shortDisplayName: String
 )

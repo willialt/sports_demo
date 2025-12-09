@@ -8,7 +8,7 @@ data class TeamXX(
     val displayName: String,
     val id: String,
     val isActive: Boolean,
-    val links: List<LinkX>,
+    val links: List<Link>,
     val location: String,
     val logo: String,
     val name: String,

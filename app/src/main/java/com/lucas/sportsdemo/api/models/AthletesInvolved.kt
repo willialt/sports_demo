@@ -6,7 +6,7 @@ data class AthletesInvolved(
     val headshot: String,
     val id: String,
     val jersey: String,
-    val links: List<LinkX>,
+    val links: List<Link>,
     val position: String,
     val shortName: String,
     val team: TeamXX

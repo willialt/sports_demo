@@ -5,7 +5,7 @@ data class Odd(
     val details: String,
     val header: Header,
     val homeTeamOdds: HomeTeamOdds,
-    val link: LinkXXX,
+    val link: Link,
     val moneyline: Moneyline,
     val overUnder: Double,
     val pointSpread: PointSpread,
