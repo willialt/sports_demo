@@ -33,8 +33,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.toColorInt
 import com.lucas.sportsdemo.api.GameStatus
+import com.lucas.sportsdemo.R
+
 
 
 @Composable
@@ -145,6 +148,10 @@ fun GameCard(game: GameCardUiModel) {
                                 )
                             }
 
+                            // Add place for possession icon here if game.possession == game.team2Id
+//                            PossessionIcon(isVisible = game.possession == game.team2Id)
+                            FixedPossessionSlot(show = game.possession == game.team2Id)
+
                             // === LIVE ===
                             Box(
                                 modifier = Modifier.width(110.dp),   // fixed width
@@ -154,7 +161,6 @@ fun GameCard(game: GameCardUiModel) {
                                 Column(
                                     modifier = Modifier.align(Alignment.Center),
                                     horizontalAlignment = Alignment.CenterHorizontally
-//                      verticalArrangement = Arrangement.Center
                                 ) {
                                     // Down and Distance
                                     Text(
@@ -177,6 +183,10 @@ fun GameCard(game: GameCardUiModel) {
                                     )
                                 }
                             }
+
+                            // Add place for possession icon here if game.possession == game.team1Id
+//                            PossessionIcon(isVisible = game.possession == game.team1Id)
+                            FixedPossessionSlot(show = game.possession == game.team1Id)
 
                             // === RIGHT SCORE ===
                             Box(
@@ -318,6 +328,39 @@ fun GameCard(game: GameCardUiModel) {
     }
 
 }
+
+@Composable
+fun PossessionIcon(isVisible: Boolean) {
+    if (!isVisible) return
+
+    Image(
+        painter = painterResource(id = R.drawable.football_icon),
+        contentDescription = "Possession",
+        modifier = Modifier
+            .size(60.dp)
+            .padding(horizontal = 2.dp),
+        contentScale = ContentScale.Fit
+    )
+}
+
+@Composable
+fun FixedPossessionSlot(show: Boolean) {
+    Box(
+        modifier = Modifier.width(38.dp),    // ⬅ consistent space even when empty
+        contentAlignment = Alignment.Center
+    ) {
+        if (show) {
+            Image(
+                painter = painterResource(id = R.drawable.football_icon),
+                contentDescription = "Possession",
+                modifier = Modifier.size(38.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+    }
+}
+
+
 private fun parseTeamColor(hex: String?): Color {
     return try {
         if (hex.isNullOrEmpty()) Color.Gray
@@ -326,6 +369,7 @@ private fun parseTeamColor(hex: String?): Color {
         Color.Gray
     }
 }
+
 
 private fun Double?.formatSpread(): String {
     return this?.let {

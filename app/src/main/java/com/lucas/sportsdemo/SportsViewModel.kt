@@ -16,6 +16,11 @@ import com.lucas.sportsdemo.api.models.Event
 import com.lucas.sportsdemo.api.basketballModels.NbaEvent
 import kotlinx.coroutines.launch
 import retrofit2.Response
+// debug imports
+import android.content.Context
+import com.google.gson.Gson
+import com.lucas.sportsdemo.util.loadJsonFromAssets
+
 
 class SportsViewModel : ViewModel(){
 
@@ -229,33 +234,25 @@ class SportsViewModel : ViewModel(){
         )
     }
 
+    // live debug
+    fun loadDebugLiveGame(context: Context) {
+        try {
+            val json = loadJsonFromAssets(context, "live_nfl_example.json")
 
+            val gson = Gson()
+            val model = gson.fromJson(json, SportsModel::class.java)
 
-//    fun toUiModel(): GameCardUiModel { // in process of making function usable for both basketball and football
-//        val competition = competitions.firstOrNull()
-//        val competitors = competition?.competitors.orEmpty()
-//        val broadcast = competition?.broadcasts?.firstOrNull()?.names?.firstOrNull()
-//        val away = competitors.getOrNull(0)
-//        val home = competitors.getOrNull(1)
-//        return GameCardUiModel(
-//            team1 = home?.team?.shortDisplayName ?: "TBD",
-//            team2 = away?.team?.shortDisplayName ?: "TBD",
-//            team1Record = home?.records?.firstOrNull()?.summary,
-//            team2Record = away?.records?.firstOrNull()?.summary,
-//            team1Rank = home?.curatedRank?.current ?: 99,
-//            team2Rank = away?.curatedRank?.current ?: 99,
-//            team1Abr = home?.team?.abbreviation,
-//            team2Abr = away?.team?.abbreviation,
-//            startTime = formatGameTime(competition?.date),
-////            startTime = competition?.date,
-//            spread = competition?.odds?.firstOrNull()?.spread,
-//            team1Logo = home?.team?.logo,
-//            team2Logo = away?.team?.logo,
-//            team1Color = home?.team?.color,
-//            team2Color = away?.team?.color,
-//            broadcast = broadcast
-//        )
-//    }
+            // Convert events to UI models
+            val uiModels = model.events.orEmpty().map { it.toUiModel() }
+
+            _gamesUiList.value = uiModels
+            _sportsResult.value = NetworkResponse.Success(model)
+
+        } catch (e: Exception) {
+            _sportsResult.value = NetworkResponse.Error("Debug JSON error: ${e.message}")
+        }
+    }
+
 
     private fun formatGameTime(rawDate: String?): String? {
         if (rawDate.isNullOrBlank()) return null

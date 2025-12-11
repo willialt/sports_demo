@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-11-25T18:36:45.614408045Z">
+        <DropdownSelection timestamp="2025-12-11T19:50:48.841974024Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/starbook/.android/avd/Pixel_Tablet_API_35.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/starbook/.android/avd/Nissan_12.3_display_2.avd" />
             </handle>
           </Target>
         </DropdownSelection>

@@ -36,6 +36,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import com.lucas.sportsdemo.api.BasketballModel
 import com.lucas.sportsdemo.api.SportsModel
 
@@ -46,6 +47,9 @@ fun LeaguePage(viewModel: SportsViewModel) {
     val sportsResult = viewModel.sportsResult.observeAsState()
     val gamesUiList = viewModel.gamesUiList.observeAsState(emptyList())
     var showLastWeek by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current // imported for debug
+
 
     LaunchedEffect(viewModel.currentLeague) {
         showLastWeek = false
@@ -91,6 +95,13 @@ fun LeaguePage(viewModel: SportsViewModel) {
                         )
                     }
                 }
+                // Live debug tester
+                Button(
+                    onClick = { viewModel.loadDebugLiveGame(context) }
+                ) {
+                    Text("Load Debug Live Game")
+                }
+
 
             }
         }
