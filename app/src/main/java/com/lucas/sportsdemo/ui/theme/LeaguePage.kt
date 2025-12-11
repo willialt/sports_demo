@@ -82,7 +82,7 @@ fun LeaguePage(viewModel: SportsViewModel) {
                     Button(
                         onClick = {
                         // later -> trigger API call for this league
-                         viewModel.getLeagueData(sport = league, lastWeek = false)
+                         viewModel.getLeagueData(sport = league, showPrevious = false)
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
@@ -141,8 +141,6 @@ fun LeaguePage(viewModel: SportsViewModel) {
                                         .padding(top = 24.dp),
                                     horizontalArrangement = Arrangement.Center
                                 ) {
-
-
                                     WeekTabs(
                                         leftTabName = "Last Week",
                                         rightTabName = "This Week",
@@ -153,7 +151,7 @@ fun LeaguePage(viewModel: SportsViewModel) {
                                             val sport = viewModel.currentLeague ?: return@WeekTabs
                                             viewModel.getLeagueData(
                                                 sport = sport,
-                                                lastWeek = isLastWeek
+                                                showPrevious = isLastWeek
                                             )
                                         }
                                     )
@@ -168,6 +166,28 @@ fun LeaguePage(viewModel: SportsViewModel) {
                                 }
                             }
                             is BasketballModel -> {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF5F5F5))
+                                        .padding(top = 24.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    WeekTabs(
+                                        leftTabName = "Yesterday",
+                                        rightTabName = "Today",
+                                        selected = showLastWeek,
+                                        onSelect = { isLastWeek ->
+                                            showLastWeek = isLastWeek
+
+                                            val sport = viewModel.currentLeague ?: return@WeekTabs
+                                            viewModel.getLeagueData(
+                                                sport = sport,
+                                                showPrevious = isLastWeek
+                                            )
+                                        }
+                                    )
+                                }
                                 LazyColumn {
                                     items(gamesUiList.value) { game ->
                                         GameCard(game = game)

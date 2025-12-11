@@ -20,6 +20,9 @@ import retrofit2.Response
 import android.content.Context
 import com.google.gson.Gson
 import com.lucas.sportsdemo.util.loadJsonFromAssets
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import java.time.LocalDate
 
 
 class SportsViewModel : ViewModel(){
@@ -34,12 +37,16 @@ class SportsViewModel : ViewModel(){
 
     // new variables for parameters
     var defaultWeek: Int? = null
+    var defaultDay: String? = null
+    private val _selectedDate = MutableStateFlow(LocalDate.now()) // dates for basketball
+    val selectedDate = _selectedDate.asStateFlow()
+
     var defaultYear : Int? = null
     var defaultSeasonType: Int? = null
     var currentLeague: String? = null
 
 
-    fun getLeagueData(sport: String, lastWeek: Boolean) {
+    fun getLeagueData(sport: String, showPrevious: Boolean) {
         // Reset defaults whenever user selects a new league
         if (currentLeague != sport) {
             defaultWeek = null
@@ -70,7 +77,20 @@ class SportsViewModel : ViewModel(){
 //                val json = raw.body()?.string()
 //                Log.i("NBA_RAW", json ?: "NULL_JSON")
                 if (sportCategory == "basketball") {
-                    val response = sportsApi.getBasketballGames("basketball", leaguePath)
+                    val dayToLoad: String = if (showPrevious){
+                        // change string to prev day "2025-12-07" -> "2025-12-06"
+                        _selectedDate.value.minusDays(1).toString().replace("-", "")
+                    } else {
+                        _selectedDate.value.toString().replace("-", "")
+                    }
+
+                    Log.i("default day", dayToLoad) // logs 20251211 and 20251210 for clicking on today and yesterday tabs but only today's games appear?
+
+                    val response = sportsApi.getBasketballGames("basketball", leaguePath, dayToLoad)
+                    Log.i(
+                        "test url",
+                        "URL test: $sportCategory / $leaguePath -> ${response.raw().request.url}"
+                    ) // the url test incorrectly prints the scoreboard link with no query parameter attached...
                     if (response.isSuccessful) {
                         val model = response.body()
                         _sportsResult.value = NetworkResponse.Success(model!!) // Error here
@@ -82,13 +102,12 @@ class SportsViewModel : ViewModel(){
 
                     } else {
                         _sportsResult.value = NetworkResponse.Error("Failed to load data")
-                        //                            Log.i("Error", response.message())
                     }
                 }
 
                 // football stuff ---
                 if (sportCategory == "football") {
-                    val weekToLoad = if (lastWeek) defaultWeek?.minus(1) else defaultWeek
+                    val weekToLoad = if (showPrevious) defaultWeek?.minus(1) else defaultWeek
 
                     val response = sportsApi.getFootballGames(
                         league = leaguePath,

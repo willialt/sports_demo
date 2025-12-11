@@ -22,14 +22,14 @@ interface SportsApi {
     suspend fun getBasketballGames(
         @retrofit2.http.Path("sport") sport: String,
         @retrofit2.http.Path("league") league: String,
-        @Query("dates") date: String? = null
+        @Query("dates") date: String?
     ) : Response<BasketballModel>
 
     @GET("apis/site/v2/sports/{sport}/{league}/scoreboard")
     suspend fun getRawJson(
         @retrofit2.http.Path("sport") sport: String,
         @retrofit2.http.Path("league") league: String,
-        @Query("dates") date: String? = null
+        @Query("dates") date: String,
     ): Response<ResponseBody> // this is okhttp3 not retrofit 2
 
 }
