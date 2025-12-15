@@ -37,12 +37,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lucas.sportsdemo.api.BasketballModel
 import com.lucas.sportsdemo.api.SportsModel
 
 
 @Composable
-fun LeaguePage(viewModel: SportsViewModel) {
+fun LeaguePage(
+    viewModel: SportsViewModel = viewModel(),
+    onGameClick: (String?) -> Unit
+) {
 
     val sportsResult = viewModel.sportsResult.observeAsState()
     val gamesUiList = viewModel.gamesUiList.observeAsState(emptyList())
@@ -161,7 +165,10 @@ fun LeaguePage(viewModel: SportsViewModel) {
                                 }
                                 LazyColumn {
                                     items(gamesUiList.value) { game ->
-                                        GameCard(game = game)
+                                        GameCard(
+                                            game = game,
+                                            onClick = { onGameClick(game.id) }
+                                        )
                                     }
                                 }
                             }
@@ -190,7 +197,10 @@ fun LeaguePage(viewModel: SportsViewModel) {
                                 }
                                 LazyColumn {
                                     items(gamesUiList.value) { game ->
-                                        GameCard(game = game)
+                                        GameCard(
+                                            game = game,
+                                            onClick = { onGameClick(game.id) }
+                                        )
                                     }
                                 }
                             }

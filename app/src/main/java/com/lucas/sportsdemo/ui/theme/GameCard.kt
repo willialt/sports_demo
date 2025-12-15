@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -41,7 +42,10 @@ import com.lucas.sportsdemo.R
 
 
 @Composable
-fun GameCard(game: GameCardUiModel) {
+fun GameCard(
+    game: GameCardUiModel,
+    onClick: () -> Unit
+    ) {
     val team1Color = parseTeamColor(game.team1Color)
     val team2Color = parseTeamColor(game.team2Color)
 
@@ -49,7 +53,8 @@ fun GameCard(game: GameCardUiModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp, horizontal = 12.dp),
+            .padding(vertical = 6.dp, horizontal = 12.dp)
+            .clickable{ onClick() },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
@@ -361,7 +366,7 @@ fun FixedPossessionSlot(show: Boolean) {
 }
 
 
-private fun parseTeamColor(hex: String?): Color {
+fun parseTeamColor(hex: String?): Color {
     return try {
         if (hex.isNullOrEmpty()) Color.Gray
         else Color("#$hex".toColorInt())
@@ -371,48 +376,50 @@ private fun parseTeamColor(hex: String?): Color {
 }
 
 
-private fun Double?.formatSpread(): String {
+fun Double?.formatSpread(): String {
     return this?.let {
         if (it >= 0) "+$it" else "$it"
     } ?: "N/A"
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GameCardPreview() {
-    SportsDemoTheme {
-        GameCard(
-            game = GameCardUiModel(
-                team1 = "USC",
-                team2 = "Northwestern",
-                team1Id = "24",
-                team2Id = "21",
-                team1Record = "7–2",
-                team2Record = "8–1",
-                team1Rank = 20,
-                team2Rank = 99,
-                startTime = "Fri 8:00 PM ET",
-                team1Abr = "USC",
-                team2Abr = "NU",
-                spread = -3.5,
-                team1Logo = "https://a.espncdn.com/i/teamlogos/ncaa/500/30.png",
-                team2Logo = "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/den.png",
-                team1Color = "9e2237",
-                team2Color = "582c83",
-                broadcast = "FOX",
-                status = GameStatus.LIVE, // add team scores and winner
-                homeScore = "17",
-                awayScore = "13",
-                homeWinner = false,
-                awayWinner = false,
-                displayClock = "1:31",
-                period = 3,
-                shortDetail = "1:33 - 4th",
-                // Live variables
-                possession = "24",
-                possessionText = "PHI 34",
-                shortDownDistanceText = "3rd and 10",
-            )
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun GameCardPreview() {
+//    SportsDemoTheme {
+//        GameCard(
+//            game = GameCardUiModel(
+//                team1 = "USC",
+//                team2 = "Northwestern",
+//                team1Id = "24",
+//                team2Id = "21",
+//                team1Record = "7–2",
+//                team2Record = "8–1",
+//                team1Rank = 20,
+//                team2Rank = 99,
+//                startTime = "Fri 8:00 PM ET",
+//                team1Abr = "USC",
+//                team2Abr = "NU",
+//                spread = -3.5,
+//                team1Logo = "https://a.espncdn.com/i/teamlogos/ncaa/500/30.png",
+//                team2Logo = "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/den.png",
+//                team1Color = "9e2237",
+//                team2Color = "582c83",
+//                broadcast = "FOX",
+//                status = GameStatus.LIVE, // add team scores and winner
+//                homeScore = "17",
+//                awayScore = "13",
+//                homeWinner = false,
+//                awayWinner = false,
+//                displayClock = "1:31",
+//                period = 3,
+//                shortDetail = "1:33 - 4th",
+//                // Live variables
+//                id = "12345",
+//                possession = "24",
+//                possessionText = "PHI 34",
+//                shortDownDistanceText = "3rd and 10",
+//                onClick = {} // how to I fill in the function to prevent preview error?
+//            )
+//        )
+//    }
+//}

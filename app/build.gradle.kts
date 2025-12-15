@@ -68,5 +68,7 @@ dependencies {
 
     // async images
     implementation("io.coil-kt:coil-compose:2.6.0")
+    // nav host
+    implementation("androidx.navigation:navigation-compose:2.7.0")
 
 }

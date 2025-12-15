@@ -1,10 +1,12 @@
 package com.lucas.sportsdemo.api
 
-data class GameCardUiModel(
-    val team1: String,
-    val team2: String,
+data class GameDetailUiModel(
+    val team1: String?,
+    val team2: String?,
     val team1Id: String?,
     val team2Id: String?,
+    val team1Short:  String?,
+    val team2Short: String?,
     val team1Record: String?,
     val team2Record: String?,
     val team1Rank: Int?,
@@ -26,8 +28,19 @@ data class GameCardUiModel(
     val displayClock: String?,
     val period: Int?,
     val shortDetail: String?,
-    val possession: String?,
     val shortDownDistanceText: String?,
-    val possessionText: String?,
+    val homeSpreadOdds: Double?,
+    val awaySpreadOdds: Double?,
+    val homeMlOdds: Double?,
+    val awayMlOdds: Double?,
+    val overUnder: Double?,
+    val overOdds: Double?,
+    val underOdds: Double?,
     val id: String?,
+    val homePossession: Boolean?,
+    val awayPossession: Boolean?,
+    val yardLineText: String?,
+    val yardsToEndzone: Int?,
+    val playSummary: String?,
+
 )

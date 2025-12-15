@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.lucas.sportsdemo.navigation.AppNavHost
 import com.lucas.sportsdemo.ui.theme.LeaguePage
 import com.lucas.sportsdemo.ui.theme.SportsDemoTheme
 
@@ -20,12 +21,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val sportsViewModel = ViewModelProvider(this)[SportsViewModel::class.java]
+//        val sportsViewModel = ViewModelProvider(this)[SportsViewModel::class.java]
 
         enableEdgeToEdge()
         setContent {
             SportsDemoTheme {
-                LeaguePage(sportsViewModel)
+                AppNavHost()
+//                LeaguePage(sportsViewModel)
             }
         }
     }

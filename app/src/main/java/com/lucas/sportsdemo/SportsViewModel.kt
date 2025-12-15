@@ -19,10 +19,15 @@ import retrofit2.Response
 // debug imports
 import android.content.Context
 import com.google.gson.Gson
+import com.lucas.sportsdemo.api.GameDetailModel
+import com.lucas.sportsdemo.api.GameDetailUiModel
 import com.lucas.sportsdemo.util.loadJsonFromAssets
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 
 class SportsViewModel : ViewModel(){
@@ -44,6 +49,12 @@ class SportsViewModel : ViewModel(){
     var defaultYear : Int? = null
     var defaultSeasonType: Int? = null
     var currentLeague: String? = null
+
+    // Game Detail Screen
+    private val _gameDetail = MutableStateFlow<NetworkResponse<GameDetailUiModel>>(NetworkResponse.Loading)
+//    private val _gameDetail = MutableStateFlow<NetworkResponse<Any>>(NetworkResponse.Loading)
+
+    val gameDetail = _gameDetail.asStateFlow()
 
 
     fun getLeagueData(sport: String, showPrevious: Boolean) {
@@ -189,6 +200,7 @@ class SportsViewModel : ViewModel(){
             spread = competition?.odds?.firstOrNull()?.spread,
             broadcast = broadcast,
             // Live Game Info
+            id = competition?.id,
             homeScore = home?.score,
             awayScore = away?.score,
             displayClock = displayClock,
@@ -236,6 +248,8 @@ class SportsViewModel : ViewModel(){
             team1Color = home?.team?.color,
             team2Color = away?.team?.color,
             broadcast = broadcast,
+            // live data
+            id = competition?.id,
             status = status,
             homeScore = home?.score,
             awayScore = away?.score,
@@ -252,6 +266,106 @@ class SportsViewModel : ViewModel(){
 
         )
     }
+
+    fun loadGameDetail(
+        sport: String,
+        league: String,
+        gameId: String
+    ) {
+        viewModelScope.launch {
+            _gameDetail.value = NetworkResponse.Loading
+            try {
+                val response = sportsApi.getGameDetail(sport, league, gameId)
+                val model = response.body()!!
+                _gameDetail.value = NetworkResponse.Success(model.toUiModel())
+
+//                if (response.isSuccessful) {
+//                    _gameDetail.value = NetworkResponse.Success(response.body()!!)
+//                } else {
+//                    _gameDetail.value = NetworkResponse.Error("Game detail error")
+//                }
+            } catch (e: Exception) {
+                _gameDetail.value = NetworkResponse.Error("Exception: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun GameDetailModel.toUiModel(): GameDetailUiModel {
+        val competition = header?.competitions?.firstOrNull()
+        val competitors = competition?.competitors.orEmpty()
+        val broadcast = competition?.broadcasts?.firstOrNull()?.media?.shortName
+        val away = competitors.getOrNull(1)
+        val home = competitors.getOrNull(0)
+        val team1Id = home?.id
+        val team2Id = away?.id
+        val period = competition?.status?.period
+        val displayClock = competition?.status?.displayClock
+        val shortDetail = competition?.status?.type?.shortDetail
+        val status = when(competition?.status?.type?.state) {
+            "pre" -> GameStatus.UPCOMING
+            "in" -> GameStatus.LIVE
+            "post" -> GameStatus.FINAL
+            else -> GameStatus.UPCOMING
+        }
+        val lastPlay = drives?.current?.plays?.lastOrNull()
+        return GameDetailUiModel(
+            // ---- General Teams Info -----
+            team1 = home?.team?.displayName ?: "TBD",
+            team1Short = home?.team?.name ?: "TBD",
+            team1Id = team1Id,
+            team2 = away?.team?.displayName ?: "TBD",
+            team2Short = away?.team?.name ?: "TBD",
+            team2Id = team2Id,
+            team1Record = home?.record?.firstOrNull()?.summary,
+            team2Record = away?.record?.firstOrNull()?.summary,
+            team1Rank = home?.curatedRank?.current ?: 99,
+            team2Rank = away?.curatedRank?.current ?: 99,
+            team1Abr = home?.team?.abbreviation,
+            team2Abr = away?.team?.abbreviation,
+            team1Logo = home?.team?.logos?.firstOrNull()?.href,
+            team2Logo = away?.team?.logos?.firstOrNull()?.href,
+            team1Color = home?.team?.color,
+            team2Color = away?.team?.color,
+            status = status,
+            // ----- Pregame Info --------
+            startTime = formatGameTime(competition?.date), // startTime = competition?.date,
+            broadcast = broadcast,
+            // betting odds
+            spread = pickcenter?.firstOrNull()?.spread,
+            homeSpreadOdds = pickcenter?.firstOrNull()?.homeTeamOdds?.spreadOdds,
+            awaySpreadOdds = pickcenter?.firstOrNull()?.awayTeamOdds?.spreadOdds,
+            homeMlOdds = pickcenter?.firstOrNull()?.homeTeamOdds?.moneyLine,
+            awayMlOdds = pickcenter?.firstOrNull()?.awayTeamOdds?.moneyLine,
+            overUnder = pickcenter?.firstOrNull()?.overUnder,
+            overOdds = pickcenter?.firstOrNull()?.overOdds,
+            underOdds = pickcenter?.firstOrNull()?.underOdds,
+
+            // Team Leaders (to do)
+
+            // Matchup predictor (to do)
+
+            // team stats (to do)
+
+            // ------ Live Game Info -------
+            id = competition?.id,
+            homeScore = home?.score,
+            awayScore = away?.score,
+            displayClock = displayClock,
+            period = period,
+            shortDetail = shortDetail,
+            homePossession = home?.possession,
+            awayPossession = away?.possession,
+            shortDownDistanceText = lastPlay?.end?.shortDownDistanceText,
+            yardLineText = lastPlay?.end?.possessionText,
+            yardsToEndzone = lastPlay?.end?.yardsToEndzone,
+            playSummary = lastPlay?.text,
+
+            // Post game Info
+            homeWinner = home?.winner,
+            awayWinner = away?.winner
+        )
+    }
+
 
     // live debug
     fun loadDebugLiveGame(context: Context) {
@@ -282,10 +396,10 @@ class SportsViewModel : ViewModel(){
                 rawDate.replace("Z", ":00Z")
             } else rawDate
 
-            val instant = java.time.Instant.parse(normalized)
-            val formatter = java.time.format.DateTimeFormatter
+            val instant = Instant.parse(normalized)
+            val formatter = DateTimeFormatter
                 .ofPattern("EEE h:mm a")
-                .withZone(java.time.ZoneId.systemDefault())
+                .withZone(ZoneId.systemDefault())
 
             formatter.format(instant)
         } catch (e: Exception) {
