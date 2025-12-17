@@ -308,6 +308,8 @@ class SportsViewModel : ViewModel(){
             else -> GameStatus.UPCOMING
         }
         val lastPlay = drives?.current?.plays?.lastOrNull()
+//        val awayStats = boxscore?.teams?.getOrNull(0)?.statistics
+//        val homeStats = boxscore?.teams?.getOrNull(1)?.statistics
         return GameDetailUiModel(
             // ---- General Teams Info -----
             team1 = home?.team?.displayName ?: "TBD",
@@ -330,6 +332,22 @@ class SportsViewModel : ViewModel(){
             // ----- Pregame Info --------
             startTime = formatGameTime(competition?.date), // startTime = competition?.date,
             broadcast = broadcast,
+            homePregameWinProb = predictor?.homeTeam?.gameProjection,
+            awayPregameWinProb = predictor?.awayTeam?.gameProjection,
+
+            // team stats; Note: uses generic stat name since the same endpoint and variable name
+            // are used for different stats in pre vs live/post
+//            awayStat0 = awayStats?.getOrNull(0)?.displayValue, // points per game
+//            awayStat1 = awayStats?.getOrNull(1)?.displayValue, // yards per game
+//            awayStat4 = awayStats?.getOrNull(4)?.displayValue, // points per game allowed
+//            awayStat5 = awayStats?.getOrNull(5)?.displayValue, // yards per game allowed
+//            homeStat0 = homeStats?.getOrNull(0)?.displayValue, // points per game
+//            homeStat1 = homeStats?.getOrNull(1)?.displayValue, // yards per game
+//            homeStat4 = homeStats?.getOrNull(4)?.displayValue, // points per game allowed
+//            homeStat5 = homeStats?.getOrNull(5)?.displayValue, // yards per game allowed
+
+//            boxscoreTestDouble = boxscore?.teams?.firstOrNull()?.statistics?.firstOrNull()?.value,
+
             // betting odds
             spread = pickcenter?.firstOrNull()?.spread,
             homeSpreadOdds = pickcenter?.firstOrNull()?.homeTeamOdds?.spreadOdds,

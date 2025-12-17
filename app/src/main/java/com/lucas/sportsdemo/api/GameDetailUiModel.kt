@@ -14,6 +14,8 @@ data class GameDetailUiModel(
     val team1Abr: String?,
     val team2Abr: String?,
     val startTime: String?,
+    val homePregameWinProb: String?,
+    val awayPregameWinProb: String?,
     val spread: Double?,
     val team1Logo: String?,
     val team2Logo: String?,
@@ -42,5 +44,15 @@ data class GameDetailUiModel(
     val yardLineText: String?,
     val yardsToEndzone: Int?,
     val playSummary: String?,
+//    val awayStat0: String?, // points per game
+//    val awayStat1: String?, // yards per game
+//    val awayStat4: String?,  // points per game allowed
+//    val awayStat5: String?, // yards per game allowed
+//    val homeStat0: String?, // points per game
+//    val homeStat1: String?, // yards per game
+//    val homeStat4: String?,  // points per game allowed
+//    val homeStat5: String? // yards per game allowed
+//    val boxscoreTestDouble: Double?
+
 
 )

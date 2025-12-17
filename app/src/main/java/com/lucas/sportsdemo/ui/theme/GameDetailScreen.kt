@@ -38,6 +38,7 @@ import com.lucas.sportsdemo.api.GameCardUiModel
 import com.lucas.sportsdemo.api.GameDetailUiModel
 import com.lucas.sportsdemo.api.GameStatus
 import com.lucas.sportsdemo.api.NetworkResponse
+import kotlin.String
 
 
 @Composable
@@ -54,7 +55,10 @@ fun GameDetailScreen(
 
     val gameDetail = viewModel.gameDetail.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .padding(all = 24.dp)
+    ) {
 
         Button(onClick = onBack) {
             Text("Back")
@@ -77,24 +81,79 @@ fun GameDetailScreen(
 
 @Composable
 fun GameDetailContent(game: GameDetailUiModel) {
-    Text("Game Screen")
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("${game.team2} @ ${game.team1}", fontSize = 22.sp)
-        Spacer(Modifier.height(8.dp))
+    // Make Game Detail Screen include a GameCard
 
-        Text("Score: ${game.awayScore} - ${game.homeScore}")
-        Text("Status: ${game.status}")
-        Text("Clock: ${game.displayClock ?: "--"}")
-        Text("Period: ${game.period ?: "-"}")
-
-        Spacer(Modifier.height(12.dp))
-
-        if (game.status == GameStatus.LIVE) {
-            Text("Down & Distance: ${game.shortDownDistanceText ?: "---"}")
-            Text("Yard Line: ${game.yardLineText ?: "---"}")
-            Text("Last Play: ${game.playSummary ?: "---"}")
-        }
+    var possessionTeamId: String? = null
+    possessionTeamId = if (game.homePossession == true) {
+        game.team1Id
+    } else if(game.awayPossession == true) {
+        game.team2Id
+    } else {
+        null
     }
+    // String? -> String
+    var team1Name: String = ""
+    var team2Name: String = ""
+    if (game.team1 == null || game.team2 == null) {
+        team1Name = ""
+        team2Name = ""
+    }
+
+    GameCard(
+        modifier = Modifier,
+        onClick = {},
+        game = GameCardUiModel(
+            team1 = team1Name,
+            team2 = team2Name,
+            team1Id = game.team1Id,
+            team2Id = game.team2Id,
+            team1Record = game.team1Record,
+            team2Record = game.team2Record,
+            team1Rank = game.team1Rank,
+            team2Rank = game.team2Rank,
+            team1Abr = game.team1Abr,
+            team2Abr = game.team2Abr,
+            startTime = game.startTime,
+            spread = game.spread,
+            team1Logo = game.team1Logo,
+            team2Logo = game.team2Logo,
+            team1Color = game.team1Color,
+            team2Color = game.team2Color,
+            broadcast = game.broadcast,
+            status = game.status,
+            homeScore = game.homeScore,
+            awayScore = game.awayScore,
+            homeWinner = game.homeWinner,
+            awayWinner = game.awayWinner,
+            displayClock = game.displayClock,
+            period = game.period,
+            shortDetail = game.shortDetail,
+            possession = possessionTeamId,
+            shortDownDistanceText = game.shortDownDistanceText,
+            possessionText = game.yardLineText,
+            id = game.id,
+        )
+    )
+    BettingOddsCard(game = game)
+
+//    Text("Game Screen")
+//    Column(modifier = Modifier.padding(16.dp)) {
+//        Text("${game.team2} @ ${game.team1}", fontSize = 22.sp)
+//        Spacer(Modifier.height(8.dp))
+//
+//        Text("Score: ${game.awayScore} - ${game.homeScore}")
+//        Text("Status: ${game.status}")
+//        Text("Clock: ${game.displayClock ?: "--"}")
+//        Text("Period: ${game.period ?: "-"}")
+//
+//        Spacer(Modifier.height(12.dp))
+//
+//        if (game.status == GameStatus.LIVE) {
+//            Text("Down & Distance: ${game.shortDownDistanceText ?: "---"}")
+//            Text("Yard Line: ${game.yardLineText ?: "---"}")
+//            Text("Last Play: ${game.playSummary ?: "---"}")
+//        }
+//    }
 }
 
 

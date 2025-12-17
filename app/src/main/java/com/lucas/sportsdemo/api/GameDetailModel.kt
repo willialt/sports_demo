@@ -11,13 +11,14 @@ import com.lucas.sportsdemo.api.gameDetailModels.Injury
 import com.lucas.sportsdemo.api.gameDetailModels.Leader
 import com.lucas.sportsdemo.api.gameDetailModels.Meta
 import com.lucas.sportsdemo.api.gameDetailModels.News
+import com.lucas.sportsdemo.api.gameDetailModels.Predictor
 import com.lucas.sportsdemo.api.gameDetailModels.ScoringPlay
 import com.lucas.sportsdemo.api.gameDetailModels.Standings
 import com.lucas.sportsdemo.api.gameDetailModels.Winprobability
 
 data class GameDetailModel(
 //    val againstTheSpread: List<AgainstTheSpread>,
-//    val boxscore: Boxscore,
+//    val boxscore: Boxscore?,
 //    val broadcasts: List<Any?>,
     val drives: Drives?,
 //    val format: Format,
@@ -28,6 +29,7 @@ data class GameDetailModel(
 //    val meta: Meta,
 //    val news: News,
 //    val odds: List<Any?>,
+    val predictor: Predictor?,
     val pickcenter: List<BettingOdds?>?
 //    val scoringPlays: List<ScoringPlay>,
 //    val standings: Standings,

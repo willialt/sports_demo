@@ -43,6 +43,7 @@ import com.lucas.sportsdemo.R
 
 @Composable
 fun GameCard(
+    modifier: Modifier = Modifier,
     game: GameCardUiModel,
     onClick: () -> Unit
     ) {
@@ -51,7 +52,7 @@ fun GameCard(
 
     // from the event extract the teams, logos, records, start time, and spread
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp, horizontal = 12.dp)
             .clickable{ onClick() },
@@ -318,20 +319,8 @@ fun GameCard(
 
                 )
             }
-
-//            Spacer(modifier = Modifier.height(8.dp))
-
-//            // Game details row
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                Text(text = game.startTime ?: "TBD")
-//                Text(text = "${game.team2Abr} ${game.spread?.toString() ?: "N/A"}")
-//            }
         }
     }
-
 }
 
 @Composable
